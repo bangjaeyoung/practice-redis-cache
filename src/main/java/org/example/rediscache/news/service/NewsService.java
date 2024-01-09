@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.rediscache.news.config.OpenApiSecretInfo;
 import org.example.rediscache.news.dto.NewsDto;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -37,6 +38,7 @@ public class NewsService {
         return headers;
     }
     
+    @Cacheable(value = "stockNewsCache", key = "{#search, #count, #start, #sort}")
     public NewsDto.Response searchStockNews(
             String search,
             int count,
