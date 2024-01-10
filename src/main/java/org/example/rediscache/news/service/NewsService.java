@@ -77,14 +77,20 @@ public class NewsService {
                 NewsDto.Response.class
         );
         
+        NewsDto.Response newsResponse = response.getBody();
+        if (newsResponse == null) {
+            throw new IllegalArgumentException("Open API Server Error");
+        }
+        
+        // 캐시 미스일 경우, 캐시 데이터 저장
         redisTemplate.opsForValue()
                 .set(
-                        String.valueOf(cacheKey),
-                        response.getBody(),
-                        15,
+                        cacheKey,
+                        newsResponse,
+                        30,
                         TimeUnit.SECONDS
                 );
         
-        return response.getBody();
+        return newsResponse;
     }
 }
