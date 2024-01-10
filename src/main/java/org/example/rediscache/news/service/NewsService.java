@@ -2,6 +2,7 @@ package org.example.rediscache.news.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.rediscache.news.config.OpenApiSecretInfo;
 import org.example.rediscache.news.dto.NewsDto;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,20 +24,22 @@ import java.util.concurrent.TimeUnit;
  * Date: 2024-01-09
  * Description:
  */
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class NewsService {
-    private static final String NAVER_DEFAULT_URL = "https://openapi.naver.com/v1/search/";
+    private static final String NAVER_DEFAULT_URL = "https://openapi.naver.com/v1/search/news";
     
     private final OpenApiSecretInfo openApiSecretInfo;
     private final RestTemplate restTemplate;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, NewsDto.Response> redisTemplate;
     
     private HttpHeaders baseHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Naver-Client-Id", openApiSecretInfo.getNaverClientId());
         headers.set("X-Naver-Client-Secret", openApiSecretInfo.getNaverClientSecret());
+        headers.set("Content-Type", "application/json");
         
         return headers;
     }
@@ -49,18 +52,18 @@ public class NewsService {
             String sort) {
         
         String cacheKey = "stockNews: " + search;
-        Object cacheValue = redisTemplate.opsForValue().get(cacheKey);
+        NewsDto.Response cacheValue = redisTemplate.opsForValue().get(cacheKey);
+        
         if (cacheValue != null) {
-            return (NewsDto.Response) cacheValue;
+            log.info("Redis cache existed!");
+            return cacheValue;
         }
         
-        HttpHeaders requestHeaders = baseHeaders();
-        requestHeaders.set("Content-Type", "application/json");
+        log.info("Redis cache doesn't existed!");
         
-        HttpEntity<String> requestMessage = new HttpEntity<>(requestHeaders);
-        String url = NAVER_DEFAULT_URL + "news";
+        HttpEntity<String> requestMessage = new HttpEntity<>(baseHeaders());
         
-        UriComponents uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+        UriComponents uriBuilder = UriComponentsBuilder.fromHttpUrl(NAVER_DEFAULT_URL)
                 .queryParam("query", search)
                 .queryParam("display", count)
                 .queryParam("start", start)
@@ -73,7 +76,6 @@ public class NewsService {
                 requestMessage,
                 NewsDto.Response.class
         );
-        
         
         redisTemplate.opsForValue()
                 .set(
