@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -15,13 +14,13 @@ import java.util.List;
  * Date: 2024-01-09
  * Description:
  */
-public class NewsDto implements Serializable {
+public class NewsDto {
     
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Response implements Serializable {
+    public static class Response {
         private String lastBuildDate;
         private Integer total;
         private Integer start;
@@ -32,7 +31,7 @@ public class NewsDto implements Serializable {
         @Builder
         @NoArgsConstructor
         @AllArgsConstructor
-        private static class Item implements Serializable {
+        private static class Item {
             private String title;
             private String originallink;
             private String link;
