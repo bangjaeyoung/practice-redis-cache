@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.rediscache.news.config.OpenApiSecretInfo;
 import org.example.rediscache.news.dto.NewsDto;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * PackageName: org.example.rediscache.news.service
@@ -29,6 +31,7 @@ public class NewsService {
     
     private final OpenApiSecretInfo openApiSecretInfo;
     private final RestTemplate restTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     
     private HttpHeaders baseHeaders() {
         HttpHeaders headers = new HttpHeaders();
@@ -38,12 +41,18 @@ public class NewsService {
         return headers;
     }
     
-    @Cacheable(value = "stockNewsCache", key = "{#search, #count, #start, #sort}")
+    //    @Cacheable(value = "stockNews", key = "{#search, #count, #start, #sort}", unless = "#result == null")
     public NewsDto.Response searchStockNews(
             String search,
             int count,
             int start,
             String sort) {
+        
+        String cacheKey = "stockNews: " + search;
+        Object cacheValue = redisTemplate.opsForValue().get(cacheKey);
+        if (cacheValue != null) {
+            return (NewsDto.Response) cacheValue;
+        }
         
         HttpHeaders requestHeaders = baseHeaders();
         requestHeaders.set("Content-Type", "application/json");
@@ -64,6 +73,15 @@ public class NewsService {
                 requestMessage,
                 NewsDto.Response.class
         );
+        
+        
+        redisTemplate.opsForValue()
+                .set(
+                        String.valueOf(cacheKey),
+                        response.getBody(),
+                        15,
+                        TimeUnit.SECONDS
+                );
         
         return response.getBody();
     }
