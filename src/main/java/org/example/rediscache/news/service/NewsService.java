@@ -3,7 +3,7 @@ package org.example.rediscache.news.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.rediscache.news.config.OpenApiSecretInfo;
+import org.example.rediscache.config.OpenApiSecretInfo;
 import org.example.rediscache.news.dto.NewsDto;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;

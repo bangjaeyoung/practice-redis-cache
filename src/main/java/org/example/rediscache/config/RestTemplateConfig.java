@@ -1,4 +1,4 @@
-package org.example.rediscache.news.config;
+package org.example.rediscache.config;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.nio.charset.StandardCharsets;
 
 /**
- * PackageName: org.example.rediscache.news.config
+ * PackageName: org.example.rediscache.config
  * FileName: RestTemplateConfig
  * Author: bangjaeyoung
  * Date: 2024-01-09

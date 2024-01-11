@@ -12,7 +12,7 @@
 //import org.springframework.data.redis.serializer.StringRedisSerializer;
 //
 ///**
-// * PackageName: org.example.rediscache.news.config
+// * PackageName: org.example.rediscache.config
 // * FileName: RedisConfig
 // * Author: bangjaeyoung
 // * Date: 2024-01-09

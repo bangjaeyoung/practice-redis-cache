@@ -1,4 +1,4 @@
-package org.example.rediscache.news.config;
+package org.example.rediscache.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
@@ -11,7 +11,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * PackageName: org.example.rediscache.news.config
+ * PackageName: org.example.rediscache.config
  * FileName: RedisCacheConfig
  * Author: bangjaeyoung
  * Date: 2024-01-09
