@@ -13,6 +13,7 @@ import org.example.rediscache.stock.overall.repository.KOSDAQStockListRepository
 import org.example.rediscache.stock.overall.repository.KOSPIStockIndexRepository;
 import org.example.rediscache.stock.overall.repository.KOSPIStockListRepository;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -162,5 +163,22 @@ public class OverallStockService {
     
     private void verifyExistsData(List<?> data) {
         if (data.isEmpty()) throw new BusinessLogicException(ExceptionCode.CANNOT_FOUND_STOCK_DATA);
+    }
+    
+    // 매일 오전 11시 5분 15초에 주식 데이터가 갱신되기 때문에, 동시에 캐시 데이터 삭제
+//    @Scheduled(cron = "15 5 11 * * *", zone = "Asia/Seoul")
+    @Scheduled(fixedRate = 60000)
+    public void deleteOverallStockCache() {
+        String KOSPIIndexCacheKey = "KOSPIStockIndex: ";
+        redisTemplate.delete(KOSPIIndexCacheKey);
+        
+        String KOSDAQIndexCacheKey = "KOSDAQStockIndex: ";
+        redisTemplate.delete(KOSDAQIndexCacheKey);
+        
+        String KOSPIListCacheKey = "KOSPIStockList: ";
+        redisTemplate.delete(KOSPIListCacheKey);
+        
+        String KOSDAQListCacheKey = "KOSDAQStockList: ";
+        redisTemplate.delete(KOSDAQListCacheKey);
     }
 }
